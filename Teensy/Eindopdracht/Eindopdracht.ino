@@ -1,9 +1,16 @@
-void setup() {
-  // put your setup code here, to run once:
+#define LED 5
+#define POT 14
 
+int potValue = 0;
+
+void setup() {
+  pinMode(LED, OUTPUT);
+  pinMode(POT, INPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  potValue = analogRead(POT);
+  Serial.println("/freq " + String(potValue));
+  delay(10);
 }

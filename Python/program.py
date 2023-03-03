@@ -1,9 +1,10 @@
-from bridge import teensy, udp
+import bridge
 
-def setup():
+def setup(serialData):
     #Program Setup
     pass
 
-def loop():
+def loop(serialData):
     #Program Loop
-    pass
+    route, value = bridge.serialToOSC(serialData)
+    bridge.sendOSC(route, value)

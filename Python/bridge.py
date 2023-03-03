@@ -1,59 +1,53 @@
-import socket
 import serial
 import keyboard
 import program
+from pythonosc import udp_client
 
 UDP_HOST = "127.0.0.1"
 UDP_PORT = 53532
 
-SERIAL_PORT = "/dev/cu.usbmodemOJA_0011"
+SERIAL_PORT = "/dev/tty.usbmodemOJA_0011"
 
 teensy = None
-udp = None
+udp = udp_client.SimpleUDPClient(UDP_HOST, UDP_PORT)
 
-def connect():
-    udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    if udp == None:
-        return False
-    
-    udp.connect((UDP_HOST, UDP_PORT))
-
-    return True
 
 def main():
     print ("Opening serial port... ({serial_port})".format(serial_port = SERIAL_PORT))
-    teensy = serial.Serial(SERIAL_PORT, 19200, timeout=1)
+    teensy = serial.Serial(SERIAL_PORT, 9600, timeout=1)
     if teensy.is_open == False:
         print("ERROR: Could not communicate on serial port: {serial_port}", serial_port=SERIAL_PORT)
         quit()
     
     print("Successfully connected to serial port!")
-
-    udp_status = connect()
-    if udp_status == False:
-        print("ERROR: Could not establish UDP connection on: {host}:{port}", host=HOST, port=PORT)
-        print("Closing...")
-        teensy.close()
-        quit()
     
     print("Successfully established UDP connection!")
 
-    program.setup()
+    program.setup(teensy.readline())
 
-    print("Now running... (press Q to quit)")
+    print("Now running... (press Ctrl+C to quit)")
 
-    while True:
-        try:
-            if keyboard.is_pressed('q'):
-                break
-        except:
-            continue
+    isRunning = True
 
-        program.loop()
+    while isRunning:
+        program.loop(teensy.readline())
 
 
     print("Closing...")
     teensy.close()
 
+def serialToOSC(bData):
+    strData = str(bData)
+
+    route = strData.split(' ')[0].split('\'')[1]
+    value = int(strData.split(' ')[1].split('\\')[0])
+
+    return route, value
+
+def readLineFromSerial():
+    return teensy.readline()
+
+def sendOSC(route, value):
+    udp.send_message(route, value)
 if __name__ == "__main__":
     main()
