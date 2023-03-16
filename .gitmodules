@@ -1,0 +1,3 @@
+[submodule "csdosc"]
+	path = csdosc
+	url = git@github.com:csdhku/csdosc.git
