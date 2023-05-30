@@ -8,7 +8,7 @@
 #define FILTER_BLOCK_SIZE 16
 
 // Sensor Threshold For Harp String Activation
-#define TRIGGER_THRESHOLD 512
+#define TRIGGER_THRESHOLD 100
 
 // Vertical (V) & Horizontal (H) Sensor Pins
 int pSensorV[8] = { 14, 15, 16, 17, 18, 19, 20, 21 };
@@ -32,17 +32,19 @@ void setup() {
     pinMode(pSensorH[i], INPUT);
   }
 
-  Serial.println("REQ")
+  //pinMode(24, INPUT_PULLUP);
+
+  Serial.println("REQ");
 
   // Wait For Incoming Serial Messages
-  while (Serial.available() == 0) {}
+  // while (Serial.available() == 0) {}
 
   // Receive & Trim Status String
-  String statusString = Serial.readString();
-  statusString.trim();
+  //String statusString = Serial.readString();
+  //statusString.trim();
 
   // Blink Twice If Status Is OK (This Means The Software Connected Successfully To The Teensy).
-  if (statusString == "OK") {
+  /*if (statusString == "OK") {
     digitalWrite(LED, 1);
     delay(500);
     digitalWrite(LED, 0);
@@ -52,15 +54,16 @@ void setup() {
     digitalWrite(LED, 0);
     delay(1000);
   }
+  */
 
   // Set Built-in LED To On (To Show Device Turned On)
-  digitalWrite(LED, 1);
+  
 }
 
 // Sends Trigger To Software
-void sendTrigger(char prefix, int index, bool value) {
+void sendTrigger(String prefix, int index, bool value) {
   // Send Trigger Using Custom Protocol: <p><i>=<v> (p: Prefix, Possible Values: V (For Vertical Pins), H (For Horizontal Pins). i: Pin Index, Possible Values: 0 -> SENSOR_COUNT / 2. v: Pin Value. Possible Values: true / false. Example: V0=true) 
-  Serial.println(String(prefix) + String(index) + "=" + String(value));
+  //Serial.println(String(prefix) + String(index) + "=" + String(value));
 
   //Delay To Prevent Crashes
   delay(10);
@@ -75,7 +78,7 @@ void loop() {
     int currentSensorH = 0;
 
     // Add Multiple Sensor Values (Amount Defined In FILTER_BLOCK_SIZE)
-    for (int i = 0: i < FILTER_BLOCK_SIZE; i++) {
+    for (int j = 0; j < FILTER_BLOCK_SIZE; j++) {
       currentSensorV += analogRead(pSensorV[i]);
       currentSensorH += analogRead(pSensorH[i]);
     }
@@ -86,20 +89,23 @@ void loop() {
     // Check For Changes In Vertical Sensor Value
     if (currentSensorV != vSensorV[i]) {
       // Send Triggers For Vertical Sensors Based On TRIGGER_THRESHOLD
-      if (currentSensorV > TRIGGER_THRESHOLD) {
+      if (currentSensorV < TRIGGER_THRESHOLD) {
         sendTrigger("V", 0, true);
       } else {
         sendTrigger("V", 0, false);
       }
     }
 
+            Serial.println("H2=" + String(analogRead(24)));
+
     // Check For Changes In Horizontal Sensor Value
     if (currentSensorH != vSensorH[i]) {
       // Send Triggers For Horizontal Sensors Based On TRIGGER_THRESHOLD
-      if (currentSensorH > TRIGGER_THRESHOLD) {
-        sendTrigger("H", 0, true);
+      if (currentSensorH < TRIGGER_THRESHOLD) {
+        sendTrigger("H", i, true);
+
       } else {
-        sendTrigger("H", 0, false);
+        sendTrigger("H", i, false);
       }
     }
 
