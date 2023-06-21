@@ -96,7 +96,8 @@ void loop() {
       }
     }
 
-            Serial.println("H2=" + String(analogRead(24)));
+            Serial.println("H2=" + String(analogRead(14)));
+            Serial.println("H3=" + String(analogRead(15)));
 
     // Check For Changes In Horizontal Sensor Value
     if (currentSensorH != vSensorH[i]) {
