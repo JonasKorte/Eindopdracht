@@ -89,30 +89,21 @@ void loop() {
     // Check For Changes In Vertical Sensor Value
     if (currentSensorV != vSensorV[i]) {
       // Send Triggers For Vertical Sensors Based On TRIGGER_THRESHOLD
-      if (currentSensorV < TRIGGER_THRESHOLD) {
-        sendTrigger("V", 0, true);
-      } else {
-        sendTrigger("V", 0, false);
-      }
+      Serial.println("V" + String(i) + "=" + String(currentSensorV));
     }
 
-            Serial.println("H2=" + String(analogRead(14)));
-            Serial.println("H3=" + String(analogRead(15)));
+     //       Serial.println("H2=" + String(analogRead(14)));
+      //      Serial.println("H3=" + String(analogRead(15)));
 
     // Check For Changes In Horizontal Sensor Value
     if (currentSensorH != vSensorH[i]) {
       // Send Triggers For Horizontal Sensors Based On TRIGGER_THRESHOLD
-      if (currentSensorH < TRIGGER_THRESHOLD) {
-        sendTrigger("H", i, true);
-
-      } else {
-        sendTrigger("H", i, false);
-      }
+      Serial.println("H" + String(i) + "=" + String(currentSensorH));
     }
 
     // Update Stored Sensor Values
     vSensorV[i] = currentSensorV;
-    vSensorH[i] = currentSensorV;
+    vSensorH[i] = currentSensorH;
   }
 
   // Delay To Prevent Computer Hang
