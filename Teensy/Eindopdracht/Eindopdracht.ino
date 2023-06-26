@@ -11,12 +11,14 @@
 #define TRIGGER_THRESHOLD 100
 
 // Vertical (V) & Horizontal (H) Sensor Pins
-int pSensorV[8] = { 14, 15, 16, 17, 18, 19, 20, 21 };
-int pSensorH[8] = { 22, 23, 24, 25, 26, 27, 38, 39 };
+int pSensorH[8] = { 14, 15, 16, 17, 18, 19, 20, 21 };
+int pSensorV[8] = { 22, 23, 24, 25, 26, 27, 38, 39 };
 
 // Vertical (V) & Horizontal (H) Sensor Previous Values
 bool vSensorV[8] = { false, false, false, false, false, false, false, false };
 bool vSensorH[8] = { false, false, false, false, false, false, false, false };
+
+int lastSensor = -1;
 
 // Run Once
 void setup() {
@@ -25,6 +27,8 @@ void setup() {
 
   // Start Serial Communication With BAUD Rate: 9600
   Serial.begin(9600);
+  SerialUSB1.begin(9600);
+  SerialUSB2.begin(9600);
 
   // Set All Sensor Pin Modes To Input
   for (int i = 0; i < SENSOR_COUNT / 2; i++) {
@@ -34,7 +38,7 @@ void setup() {
 
   //pinMode(24, INPUT_PULLUP);
 
-  Serial.println("REQ");
+  //Serial.println("REQ");
 
   // Wait For Incoming Serial Messages
   // while (Serial.available() == 0) {}
@@ -89,7 +93,7 @@ void loop() {
     // Check For Changes In Vertical Sensor Value
     if (currentSensorV != vSensorV[i]) {
       // Send Triggers For Vertical Sensors Based On TRIGGER_THRESHOLD
-      Serial.println("V" + String(i) + "=" + String(currentSensorV));
+      //Serial.println("V" + String(i) + "=" + String(currentSensorV));
     }
 
      //       Serial.println("H2=" + String(analogRead(14)));
@@ -98,7 +102,16 @@ void loop() {
     // Check For Changes In Horizontal Sensor Value
     if (currentSensorH != vSensorH[i]) {
       // Send Triggers For Horizontal Sensors Based On TRIGGER_THRESHOLD
-      Serial.println("H" + String(i) + "=" + String(currentSensorH));
+      if (currentSensorH < 50 && i != lastSensor) {
+        Serial.print(i);
+        SerialUSB1.print(i);
+        SerialUSB2.print(i);
+
+        lastSensor = i;
+      }
+    }
+    if (i == 4) {
+      //Serial.println(currentSensorH);
     }
 
     // Update Stored Sensor Values
